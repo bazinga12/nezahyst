@@ -100,6 +100,9 @@ export class BaseUser extends BaseEntity{
   @IsEnum(UserStatus)
   status: UserStatus;
 
+  @Column({type:"boolean", default:true})
+  @IsBoolean()
+  isActive:boolean
 
   // @BeforeInsert()
   // hashPassword() {
