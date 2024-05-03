@@ -52,11 +52,17 @@ export class UsersService {
       query.orderBy('data.createdAt', 'DESC');
     }
     try {
-      const activatedCount = await query.where('data.status = :status', {status:UserStatus.Active}).getCount()
-      const blockedCount = await query.where('data.status = :status', {status:UserStatus.Blocked}).getCount()
-      const newCount = await query.where('data.status = :status', {status:UserStatus.New}).getCount()
+      const activatedCount = await this.userRepository.count({where:{
+        status:UserStatus.Active
+      }})
+      const blockedCount = await this.userRepository.count({where:{
+        status:UserStatus.Blocked
+      }})
+      const newCount = await this.userRepository.count({where: {
+        status:UserStatus.New
+      }})
   
-      if(filters.status) query.andWhere('data.status =:status', {status:`%${filters.status}%`})
+      if(filters?.status) query.andWhere('data.status =:status', {status:`%${filters.status}%`})
   
       const [users, count] = await query.skip((page) * perPage).take(perPage).getManyAndCount()
   

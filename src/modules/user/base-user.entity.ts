@@ -14,9 +14,9 @@ import { PasswordTransformer } from './password.transformer';
 
 
 export enum UserStatus {
-  New = 'new',
-  Active = 'active',
-  Blocked = 'blocked',
+  New = 'New',
+  Active = 'Active',
+  Blocked = 'Blocked',
 }
 
 export type PhoneData = {
@@ -27,7 +27,7 @@ export type PhoneData = {
 export enum UserRole {
   USER = 'User',
   ADMIN = 'Admin',
-  VKZB = 'Vkzb'
+  VZKB = 'Vzkb'
 }
 
 
