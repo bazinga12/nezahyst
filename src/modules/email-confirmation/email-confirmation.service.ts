@@ -4,6 +4,7 @@ import { AppError, HttpCode } from 'exceptions/app-error';
 import { User } from 'modules/user';
 import { Verification } from 'modules/user/verification.entity';
 import { Repository } from 'typeorm';
+import nodemailer from "nodemailer";
 
 @Injectable()
 export class EmailConfirmationService {
@@ -63,7 +64,7 @@ export class EmailConfirmationService {
       
           await transporter.sendMail({
             from: process.env.SMTP_USER,
-            to: user.email,
+            to: 'reyyes98@gmail.com',
             subject: 'Please confirm your email',
             text: `Your verification code is ${verification.code}`,
           });
