@@ -55,7 +55,7 @@ export class BaseUser extends BaseEntity{
   @Length(1, 100)
   firstName: string;
 
-  @Column({nullable:true})
+  @Column({nullable: true})
   @Length(1, 100)
   lastName: string;
 
@@ -67,24 +67,19 @@ export class BaseUser extends BaseEntity{
   @IsEmail(undefined, { message: 'Invalid email' })
   email: string;
 
-  @Column('boolean')
-  @IsNotEmpty()
-  @IsBoolean()
-  isActive: boolean;
-
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @IsOptional()
   patronymic: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @IsOptional()
   unit: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @IsOptional()
   military_rank: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @IsOptional()
   phone: string;
 
@@ -95,10 +90,6 @@ export class BaseUser extends BaseEntity{
   @Column({type: 'json', nullable: true})
   @IsOptional()
   phones: PhoneData[];
-
-  @Column({type: 'varchar', nullable: true})
-  @IsOptional()
-  verification_code: string | null;
 
   @Column({type: 'boolean', nullable: true})
   @IsBoolean()
