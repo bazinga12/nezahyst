@@ -17,8 +17,6 @@ export class EmailConfirmationService {
         @InjectRepository(Verification) private readonly verificationRepository: Repository<Verification>
     ){}
 
-  
-
     public async sendConfirmationEmail(userId: string):Promise<{
       previousVerificaitonDates: Date[]
     }>  {
