@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from './../config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminModule } from 'modules/admin/admin.module';
+import { UnitsModule } from 'modules/units/units.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { AdminModule } from 'modules/admin/admin.module';
     ConfigModule,
     AuthModule,
     CommonModule,
-    AdminModule
+    AdminModule,
+    UnitsModule
   ],
   controllers: [AppController],
   providers: [AppService],
