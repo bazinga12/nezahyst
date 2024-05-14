@@ -27,9 +27,8 @@ export type PhoneData = {
 export enum UserRole {
   USER = 'User',
   ADMIN = 'Admin',
-  VKZB = 'Vkzb'
+  VZKB = 'Vzkb'
 }
-
 
 @Entity({
   name: 'base_user',

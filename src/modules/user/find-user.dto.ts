@@ -12,7 +12,7 @@ import {
   import { Type } from 'class-transformer';
 import { UserStatus } from './base-user.entity';
 
-  enum SortValue {
+export enum SortValue {
     ASC = 'ASC',
     DESC = 'DESC',
   }

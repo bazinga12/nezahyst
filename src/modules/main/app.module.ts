@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminModule } from 'modules/admin/admin.module';
 import { UnitsModule } from 'modules/units/units.module';
+import { FileCategoriesModule } from 'modules/file-categories/file-categories.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { UnitsModule } from 'modules/units/units.module';
     AuthModule,
     CommonModule,
     AdminModule,
-    UnitsModule
+    UnitsModule,
+    FileCategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],
