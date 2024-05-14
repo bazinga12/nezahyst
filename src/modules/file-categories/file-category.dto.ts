@@ -1,11 +1,7 @@
-import { IsEnum, IsOptional, IsString } from "class-validator";
-import { NetworkType } from "./file-categories.entity";
+import { IsOptional, IsString } from "class-validator";
 
 
 export class FileCategoryDTO {
-    @IsEnum(NetworkType, {each:true})
-    networkType:NetworkType[]
-
     @IsString()
     name:string
 
