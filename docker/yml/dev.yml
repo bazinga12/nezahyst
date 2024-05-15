@@ -1,0 +1,38 @@
+version: "3.9"
+
+networks:
+  traefik:
+    external: true
+  app:
+    driver: bridge
+
+services:
+  app:
+    image: repo@image
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.services.dev_project@name.loadbalancer.server.port=3000"
+      - "traefik.http.services.dev_project@name.loadbalancer.passHostHeader=true"
+      - "traefik.http.routers.dev_project@name.middlewares=dev_project@name_middlewares@file"
+      - "traefik.http.routers.dev_project@name.rule=Host(`example.com`)"
+      - "traefik.http.routers.dev_project@name.tls.certresolver=lehttp"
+    networks:
+      - traefik
+      - app
+
+  db-ezab:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ahw2iech6Fo3aeTh5fie
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    networks:
+      - app
