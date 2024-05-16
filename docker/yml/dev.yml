@@ -25,6 +25,8 @@ services:
     networks:
       - traefik
       - app
+    volumes:
+      - .env:/app/.env
 
   db-ezab:
     image: postgres:14-alpine
