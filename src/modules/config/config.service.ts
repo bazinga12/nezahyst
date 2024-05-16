@@ -6,6 +6,10 @@ export class ConfigService {
 
   constructor(filePath: string) {
     console.log('=====', filePath)
+    const dir = fs.readdirSync('.');
+    console.log('Current dir', dir)
+    const parent = fs.readdirSync('./../');
+    console.log('Parent', parent)
     this.envConfig = dotenv.parse(fs.readFileSync(filePath));
   }
 
