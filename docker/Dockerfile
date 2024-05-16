@@ -1,17 +1,16 @@
-FROM node:lts-alpine
+FROM node:18-alpine
+
+RUN apk add --update python3 make g++\
+   && rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV development
 COPY package.json yarn.lock ./
-
-# install dev dependencies too
-RUN set -x && yarn --prod=true
+RUN yarn
 
 COPY . .
-RUN set -x && yarn run prestart:prod
 
 EXPOSE 3000
 
-
-CMD [ "node", "dist/main.js" ]
+CMD [ "yarn", "start:dev" ]
