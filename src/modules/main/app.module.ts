@@ -21,7 +21,7 @@ import { AdminModule } from 'modules/admin/admin.module';
           password: configService.get('POSTGRES_PASSWORD'),
           database: configService.get('POSTGRES_DB'),
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
-          synchronize: true,
+          synchronize: false,
         } as TypeOrmModuleAsyncOptions;
       },
     }),
