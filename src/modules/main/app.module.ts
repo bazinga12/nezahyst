@@ -14,7 +14,7 @@ import { AdminModule } from 'modules/admin/admin.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          type: configService.get('DB_TYPE'),
+          type: 'postgres',
           host: configService.get('POSTGRES_HOST'),
           port: configService.get('PGPORT'),
           username: configService.get('POSTGRES_USER'),
