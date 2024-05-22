@@ -1,0 +1,27 @@
+version: "3.9"
+
+networks:
+  traefik:
+    external: true
+  database:
+    external: true
+
+services:
+  app:
+    image: repo@image
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.services.prod_project@name.loadbalancer.server.port=3000"
+      - "traefik.http.services.prod_project@name.loadbalancer.passHostHeader=true"
+      - "traefik.http.routers.prod_project@name.middlewares=prod_project@name_middlewares@file"
+      - "traefik.http.routers.prod_project@name.rule=Host(`example.com`)"
+      - "traefik.http.routers.prod_project@name.tls.certresolver=lehttp"
+    networks:
+      - traefik
+      - database

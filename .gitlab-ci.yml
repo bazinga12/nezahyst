@@ -1,0 +1,151 @@
+stages:
+  - packages
+  - build
+  - docker-build
+  - deploy
+
+install-packages-dev:
+  stage: packages
+  image: node:18-alpine
+  cache:
+    key: '$CI_JOB_NAME'
+    paths:
+      - node_modules/
+    policy: pull-push
+  script:
+    - yarn install --frozen-lockfile --ignore-scripts --prefer-offline
+  artifacts:
+    name: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
+    expire_in: 2 hour
+    paths:
+      - node_modules/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "move-dev"
+
+install-packages-prod:
+  stage: packages
+  image: node:18-alpine
+  cache:
+    key: '$CI_JOB_NAME'
+    paths:
+      - node_modules/
+    policy: pull-push
+  script:
+    - yarn install --frozen-lockfile --ignore-scripts --prefer-offline #--production
+  artifacts:
+    name: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
+    expire_in: 2 hour
+    paths:
+      - node_modules/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+# build:node-dev:
+#   stage: build
+#   image: node:iron-alpine
+#   needs:
+#     - job: install-packages
+#       artifacts: true
+#   variables:
+#     VARIABLES: ${DEV}
+#   script:
+#     - yarn build
+#   artifacts:
+#     name: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
+#     expire_in: 2 hour
+#     paths:
+#       - dist/
+#       - node_modules/
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "dev"
+
+docker-package-dev:
+  stage: docker-build
+  image: docker:stable
+  services:
+    - docker:dind
+  dependencies:
+    - install-packages-dev
+#    - build:node-dev
+  before_script:
+    - echo ${CI_JOB_TOKEN} | docker login -u ${CI_REGISTRY_USER} --password-stdin "$CI_REGISTRY"
+  script: |
+    set -euo pipefail
+    docker build --tag "${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}" --file docker/Dockerfile ./
+    docker push "${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "move-dev"
+
+docker-package-prod:
+  stage: docker-build
+  image: docker:stable
+  services:
+    - docker:dind
+  dependencies:
+    - install-packages-prod
+#    - build:node-dev
+  before_script:
+    - echo ${CI_JOB_TOKEN} | docker login -u ${CI_REGISTRY_USER} --password-stdin "$CI_REGISTRY"
+  script: |
+    set -euo pipefail
+    docker build --tag "${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}" --file docker/Dockerfile ./
+    docker push "${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    
+dev:
+  stage: deploy
+  dependencies: []
+  needs:
+    - job: docker-package-dev
+      artifacts: false
+  variables:
+    VARIABLES: ${DEV}
+    YML_FILE: docker/yml/dev.yml
+  script: &deploy_script
+    - set -euo pipefail
+    - echo "$VARIABLES" > .env
+    - ENV_FILE=.env
+    - set -o allexport; . $ENV_FILE;
+    - rm -rf $ENV_FILE
+    - cat ${YML_FILE} > ${SERVER_PATH}/docker-compose.yml
+    - ENV_DOMAIN_URL=https://${HOSTNAME}
+    - cd ${SERVER_PATH}
+    - echo "$VARIABLES" > .env
+    - sed -i -e "s|project@name|$(echo $PROJECT | sed 's/\./_/g')|g" "docker-compose.yml"
+    - sed -i -e "s|repo@image|$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}|g" "docker-compose.yml"
+    - sed -i -e "s|example.com|${HOSTNAME}|g" "docker-compose.yml"
+    - echo ${CI_JOB_TOKEN} | docker login -u ${CI_REGISTRY_USER} --password-stdin "$CI_REGISTRY" 
+    - docker-compose pull --quiet
+    - docker-compose down -v
+    - docker-compose up -d
+  environment:
+    name: ${CI_JOB_NAME}
+    url: ${ENV_DOMAIN_URL}
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "move-dev"
+  tags:
+    - 'devserver'
+
+prod:
+  stage: deploy
+  dependencies: []
+  needs:
+    - job: docker-package-prod
+      artifacts: false
+  variables:
+    VARIABLES: ${PROD}
+    YML_FILE: docker/yml/prod.yml
+  script: *deploy_script
+  environment:
+    name: ${CI_JOB_NAME}
+    url: ${ENV_DOMAIN_URL}
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+  tags:
+    - 'e-zahyst-prod'

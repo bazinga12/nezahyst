@@ -18,7 +18,7 @@ import { EmailConfirmationModule } from 'modules/email-confirmation/email-confir
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
-          secret: configService.get('JWT_SECRET_KEY'),
+          secret: configService.get('JWT_SECRET_KEY') || 'uAsBw6WxqD',
           signOptions: {
             ...(configService.get('JWT_EXPIRATION_TIME')
               ? {
